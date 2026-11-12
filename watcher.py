@@ -230,6 +230,13 @@ def main():
     state.setdefault("jobs", {})          # id -> {..., status: open/closed, miss: n}
     state.setdefault("outbox", [])        # 送れなかった通知の再送キュー
     state.setdefault("fail_streak", 0)
+    state.setdefault("events", [])        # Claude通知用の出来事ログ（新しい順ではなく追記順）
+
+    def log_event(kind, job=None, note=""):
+        e = {"ts": t.isoformat(), "kind": kind, "note": note}
+        if job:
+            e.update({k: job.get(k, "") for k in ("id", "title", "wage", "url")})
+        state["events"] = (state["events"] + [e])[-100:]
 
     try:
         found, all_ok, any_ok, errors = fetch_all()
@@ -249,12 +256,15 @@ def main():
                            "message": f"{state['fail_streak']}回連続で求人ページを読めていません。\n" + "\n".join(errors)[:600],
                            "priority": 4, "tags": ["warning"]})
             state["last_fail_alert"] = t.isoformat()
+            log_event("error", note=" / ".join(errors)[:300])
     else:
         if state["fail_streak"] >= FAIL_ALERT_RUNS:
             events.append({"title": "✅ 日本橋求人の監視が復旧", "message": "求人ページを再び読めるようになりました。",
                            "priority": 3, "tags": ["white_check_mark"]})
+            log_event("recovered")
         state["fail_streak"] = 0
-        state["last_success_date"] = t.strftime("%Y-%m-%d")  # 日付単位（毎回コミットしないため）
+        state["last_success_date"] = t.strftime("%Y-%m-%d")
+        state["last_success_hour"] = t.strftime("%Y-%m-%dT%H:00+09:00")  # 生存確認用（1時間単位で更新）
 
         # 出現（新着・再掲載）: 1つでも入口が読めれば判定
         for jid, job in found.items():
@@ -262,11 +272,13 @@ def main():
             if prev is None:
                 if not first_run:
                     events.append(job_msg("new", job))
+                    log_event("new", job)
                 state["jobs"][jid] = {**job, "status": "open", "miss": 0,
                                       "first_seen": t.isoformat(), "last_seen": t.isoformat()}
             else:
                 if prev.get("status") == "closed":
                     events.append(job_msg("reopen", job))
+                    log_event("reopen", job)
                 prev.update({**job, "status": "open", "miss": 0, "last_seen": t.isoformat()})
 
         # 消滅（掲載終了）: 全求人が載る関東全域の一覧を最後まで読めた回だけ判定（読み込み失敗を終了と誤判定しない）
@@ -278,6 +290,7 @@ def main():
                         prev["status"] = "closed"
                         prev["closed_at"] = t.isoformat()
                         events.append(job_msg("closed", prev))
+                        log_event("closed", prev)
 
         open_jobs = [j for j in state["jobs"].values() if j.get("status") == "open"]
         listing = "\n".join(f"・{j['title']} ({j['wage']})\n  {j['url']}" for j in open_jobs) or "なし"
@@ -299,6 +312,8 @@ def main():
                        "priority": 4, "tags": ["bell"]})
 
     # 送信（失敗したものは次回再送）
+    if not NTFY_TOPIC:
+        events, state["outbox"] = [], []
     queue = state["outbox"] + events
     remaining, send_error = [], None
     for msg in queue:
