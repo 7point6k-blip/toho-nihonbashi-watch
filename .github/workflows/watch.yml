@@ -1,0 +1,55 @@
+name: TOHOシネマズ日本橋 求人チェック
+
+on:
+  schedule:
+    - cron: "3-59/10 * * * *"   # 10分ごと（GitHubの混雑で数分遅れることあり）
+  push:
+    branches: [main]
+    paths: ["watcher.py", ".github/workflows/watch.yml"]
+  workflow_dispatch:
+    inputs:
+      test_notify:
+        description: "テスト通知を送る"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: toho-watch          # 同時に2つ走って状態が壊れるのを防ぐ
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: |
+          pip install --quiet playwright==1.48.0
+          # 標準搭載のChromeを使う。無い場合だけChromiumを入れる
+          if ! command -v google-chrome >/dev/null; then python -m playwright install --with-deps chromium; fi
+
+      - name: Check
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          FORCE_TEST_NOTIFY: ${{ inputs.test_notify && '1' || '0' }}
+        run: python watcher.py
+
+      - name: Save state
+        if: always()
+        run: |
+          git config user.name "toho-watch-bot"
+          git config user.email "toho-watch-bot@users.noreply.github.com"
+          git add state.json 2>/dev/null || exit 0
+          git diff --cached --quiet && exit 0
+          git commit -m "state update" -q
+          for i in 1 2 3; do git pull --rebase -q && git push -q && exit 0; sleep 5; done
+          exit 1
