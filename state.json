@@ -4,7 +4,7 @@
     "744": {
       "first_seen": "2026-11-12T18:15:00.691227+09:00",
       "id": "744",
-      "last_seen": "2026-11-12T18:16:43.224910+09:00",
+      "last_seen": "2026-11-12T18:19:01.927650+09:00",
       "miss": 0,
       "status": "open",
       "theater": "TOHOシネマズ 日本橋",
@@ -14,17 +14,8 @@
     }
   },
   "last_heartbeat": "2026-11-12T18:15:00.691227+09:00",
-  "last_send_error": "NTFY_TOPIC が未設定",
+  "last_send_error": "",
   "last_success_date": "2026-11-12",
-  "outbox": [
-    {
-      "message": "今後、新着・再掲載・掲載終了を通知します。\n現在掲載中:\n・映画館での接客・販売スタッフ (時給 1,280円以上)\n  https://tohocinemas-recruit.net/jobfind-pc/job/All/744",
-      "priority": 3,
-      "tags": [
-        "white_check_mark"
-      ],
-      "title": "✅ 日本橋求人の監視を開始しました"
-    }
-  ],
-  "topic_set": false
+  "outbox": [],
+  "topic_set": true
 }
