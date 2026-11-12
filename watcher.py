@@ -10,6 +10,7 @@ import re
 import sys
 import time
 import unicodedata
+import urllib.error
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from urllib.parse import quote, urljoin
@@ -199,8 +200,10 @@ def send_ntfy(msg):
                 if 200 <= r.status < 300:
                     return
                 last = f"HTTP {r.status}"
+        except urllib.error.HTTPError as e:
+            last = f"HTTP {e.code}: {e.read()[:200].decode('utf-8', 'replace')}"
         except Exception as e:  # noqa: BLE001
-            last = str(e)
+            last = f"{type(e).__name__}: {e}"
         time.sleep(3 * (attempt + 1))
     raise RuntimeError(f"通知送信に失敗: {last}")
 
@@ -306,6 +309,8 @@ def main():
             send_error = str(e)
             remaining.append(msg)
     state["outbox"] = remaining[-50:]
+    state["last_send_error"] = (send_error or "")[:300]
+    state["topic_set"] = bool(NTFY_TOPIC)
     save_state(state)
 
     if send_error:
