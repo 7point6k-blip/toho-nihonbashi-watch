@@ -39,7 +39,7 @@ jobs:
 
       - name: Check
         env:
-          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC || vars.NTFY_TOPIC }}
           FORCE_TEST_NOTIFY: ${{ inputs.test_notify && '1' || '0' }}
         run: python watcher.py
 
