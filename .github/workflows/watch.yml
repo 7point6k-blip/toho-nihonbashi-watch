@@ -2,7 +2,7 @@ name: TOHOシネマズ日本橋 求人チェック
 
 on:
   schedule:
-    - cron: "3-59/10 * * * *"   # 10分ごと（GitHubの混雑で数分遅れることあり）
+    - cron: "3-59/10 * * * *"   # 10分ごと（GitHubの混雑で数分遅れることがある）
   push:
     branches: [main]
     paths: ["watcher.py", ".github/workflows/watch.yml"]
