@@ -36,7 +36,7 @@
     "744": {
       "first_seen": "2026-11-12T18:15:00.691227+09:00",
       "id": "744",
-      "last_seen": "2026-11-19T23:56:17.748654+09:00",
+      "last_seen": "2026-11-20T00:06:17.698144+09:00",
       "miss": 0,
       "status": "open",
       "theater": "TOHOシネマズ 日本橋",
@@ -48,8 +48,8 @@
   "last_fail_alert": "2026-11-19T08:53:46.259968+09:00",
   "last_heartbeat": "2026-11-19T20:16:17.638722+09:00",
   "last_send_error": "",
-  "last_success_date": "2026-11-19",
-  "last_success_hour": "2026-11-19T23:00+09:00",
+  "last_success_date": "2026-11-20",
+  "last_success_hour": "2026-11-20T00:00+09:00",
   "outbox": [],
   "topic_set": true
 }
