@@ -74,14 +74,19 @@
       "kind": "error",
       "note": "関東全域の一覧: TimeoutError: Page.wait_for_function: Timeout 20000ms exceeded. / 中央区の一覧: TimeoutError: Page.wait_for_function: Timeout 20000ms exceeded. / 関東フリーワード検索: TimeoutError: Page.wait_for_function: Timeout 20000ms exceeded.",
       "ts": "2026-11-27T16:28:13.362227+09:00"
+    },
+    {
+      "kind": "recovered",
+      "note": "",
+      "ts": "2026-11-27T16:38:13.966599+09:00"
     }
   ],
-  "fail_streak": 3,
+  "fail_streak": 0,
   "jobs": {
     "744": {
       "first_seen": "2026-11-12T18:15:00.691227+09:00",
       "id": "744",
-      "last_seen": "2026-11-27T15:58:13.174370+09:00",
+      "last_seen": "2026-11-27T16:38:13.966599+09:00",
       "miss": 0,
       "status": "open",
       "theater": "TOHOシネマズ 日本橋",
@@ -94,7 +99,7 @@
   "last_heartbeat": "2026-11-26T20:59:41.939625+09:00",
   "last_send_error": "",
   "last_success_date": "2026-11-27",
-  "last_success_hour": "2026-11-27T15:00+09:00",
+  "last_success_hour": "2026-11-27T16:00+09:00",
   "outbox": [],
   "topic_set": true
 }
